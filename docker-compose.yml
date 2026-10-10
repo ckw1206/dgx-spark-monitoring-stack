@@ -1,0 +1,60 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    user: "0:0"
+    container_name: prometheus
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "32m"
+        max-file: "4"
+    deploy:
+      resources:
+        limits:
+          memory: ${PROMETHEUS_MEMORY_LIMIT:-24g}
+    volumes:
+      - ./conf_prom:/prometheus
+      - ${PROMETHEUS_DATA_DIR:-/data/prometheus_data}:/prometheus/data
+    command:
+      - '--config.file=/prometheus/prometheus.yml'
+      - '--web.enable-remote-write-receiver'
+      - '--storage.tsdb.retention.time=60d'
+      - '--storage.tsdb.wal-compression'
+      - '--web.enable-lifecycle'
+    networks:
+      - monitoring
+    environment:
+      - DGX_HOST=${DGX_HOST}
+
+  grafana:
+    image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
+    container_name: grafana
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "16m"
+        max-file: "4"
+    deploy:
+      resources:
+        limits:
+          memory: ${GRAFANA_MEMORY_LIMIT:-4g}
+    volumes:
+      - ./conf_grafana/provisioning:/etc/grafana/provisioning
+      - ./conf_grafana/dashboards:/var/lib/grafana/dashboards
+      - ${GRAFANA_DATA_DIR:-/data/grafana_data}:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+
+networks:
+  monitoring:
+    driver: bridge

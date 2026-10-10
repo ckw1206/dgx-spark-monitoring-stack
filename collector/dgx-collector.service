@@ -1,0 +1,29 @@
+[Unit]
+Description=NVIDIA DGX Spark (GB10) Prometheus collector
+Documentation=https://github.com/shahizat/dgx-spark-dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/python3 /opt/dgx_collector.py
+Restart=on-failure
+RestartSec=5s
+
+Environment=DGX_EXPORTER_PORT=9273
+Environment=COLLECT_INTERVAL=10
+# Environment=DGX_HOST_NAME=dgx-spark
+# Environment=DGX_DRIVER_VERSION=550
+# Environment=DGX_CUDA_VERSION=12.6
+
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/proc/meminfo /proc/stat /proc/loadavg /proc/cpuinfo /etc/hostname /usr/local/cuda /usr/local/cuda-12 /usr/local/cuda-13
+PrivateTmp=true
+NoNewPrivileges=false
+SupplementaryGroups=nvidia
+
+[Install]
+WantedBy=multi-user.target
