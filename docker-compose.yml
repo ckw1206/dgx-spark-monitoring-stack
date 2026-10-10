@@ -14,18 +14,18 @@ services:
         limits:
           memory: ${PROMETHEUS_MEMORY_LIMIT:-24g}
     volumes:
-      - ./conf_prom:/prometheus
+      - ./conf_prom/prometheus.tpl.yml:/prometheus/prometheus.tpl.yml:ro
+      - ./conf_prom/prometheus.yml:/prometheus/prometheus.yml:rw
       - ${PROMETHEUS_DATA_DIR:-/data/prometheus_data}:/prometheus/data
+    entrypoint: ["/bin/sh", "-c"]
     command:
-      - '--config.file=/prometheus/prometheus.yml'
-      - '--web.enable-remote-write-receiver'
-      - '--storage.tsdb.retention.time=60d'
-      - '--storage.tsdb.wal-compression'
-      - '--web.enable-lifecycle'
+      - "apk add --no-cache gettext >/dev/null 2>&1;          envsubst < /prometheus/prometheus.tpl.yml > /prometheus/prometheus.yml;          /bin/prometheus-main --config.file=/prometheus/prometheus.yml            --web.enable-remote-write-receiver            --storage.tsdb.retention.time=60d            --storage.tsdb.wal-compression            --web.enable-lifecycle"
     networks:
       - monitoring
     environment:
       - DGX_HOST=${DGX_HOST}
+      - DGX_COLLECTOR_PORT=${DGX_COLLECTOR_PORT:-9273}
+      - DGX_SGLANG_PORT=${DGX_SGLANG_PORT:-8888}
 
   grafana:
     image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
@@ -40,6 +40,7 @@ services:
       resources:
         limits:
           memory: ${GRAFANA_MEMORY_LIMIT:-4g}
+    user: "0"
     volumes:
       - ./conf_grafana/provisioning:/etc/grafana/provisioning
       - ./conf_grafana/dashboards:/var/lib/grafana/dashboards
