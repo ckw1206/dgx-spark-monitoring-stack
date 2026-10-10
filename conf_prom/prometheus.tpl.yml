@@ -21,5 +21,6 @@ scrape_configs:
   - job_name: "dgx-spark-sglang"
     scrape_interval: 15s
     scrape_timeout: 10s
+    metrics_path: /metrics
     static_configs:
       - targets: ["${DGX_HOST}:${DGX_SGLANG_PORT:-8888}"]
