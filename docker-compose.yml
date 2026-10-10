@@ -12,14 +12,21 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${PROMETHEUS_MEMORY_LIMIT:-24g}
+          memory: ${PROMETHEUS_MEMORY_LIMIT:-4g}
     volumes:
       - ./conf_prom/prometheus.tpl.yml:/prometheus/prometheus.tpl.yml:ro
       - ./conf_prom/prometheus.yml:/prometheus/prometheus.yml:rw
       - ${PROMETHEUS_DATA_DIR:-/data/prometheus_data}:/prometheus/data
     entrypoint: ["/bin/sh", "-c"]
-    command:
-      - "apk add --no-cache gettext >/dev/null 2>&1;          envsubst < /prometheus/prometheus.tpl.yml > /prometheus/prometheus.yml;          /bin/prometheus-main --config.file=/prometheus/prometheus.yml            --web.enable-remote-write-receiver            --storage.tsdb.retention.time=60d            --storage.tsdb.wal-compression            --web.enable-lifecycle"
+    command: >-
+      apt-get update -q && apt-get install -y -q gettext-base >/dev/null 2>&1 &&
+      envsubst < /prometheus/prometheus.tpl.yml > /prometheus/prometheus.yml &&
+      /bin/prometheus
+      --config.file=/prometheus/prometheus.yml
+      --web.enable-remote-write-receiver
+      --storage.tsdb.retention.time=60d
+      --storage.tsdb.wal-compression
+      --web.enable-lifecycle
     networks:
       - monitoring
     environment:
