@@ -19,7 +19,7 @@ services:
       - ${PROMETHEUS_DATA_DIR:-/data/prometheus_data}:/prometheus/data
     entrypoint: ["/bin/sh", "-c"]
     command: >-
-      apt-get update -q && apt-get install -y -q gettext-base >/dev/null 2>&1 &&
+      apk add --no-cache gettext >/dev/null 2>&1 &&
       envsubst < /prometheus/prometheus.tpl.yml > /prometheus/prometheus.yml &&
       /bin/prometheus
       --config.file=/prometheus/prometheus.yml
