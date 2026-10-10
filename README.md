@@ -15,7 +15,7 @@ ssh root@<dgx-host>
   curl http://localhost:9273/metrics   # verify
 
 # 2. Start the monitoring stack
-cp .env .env.local   # override defaults in .env.local (git-ignored)
+cp .env.example .env   # edit .env to set DGX_HOST and other vars
 docker compose up -d
 ```
 
