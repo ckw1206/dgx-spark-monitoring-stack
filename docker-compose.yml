@@ -12,20 +12,19 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${PROMETHEUS_MEMORY_LIMIT:-24g}
+          memory: ${PROMETHEUS_MEMORY_LIMIT:-4g}
     volumes:
-      - ./conf_prom:/prometheus
+      - ./scripts/start.sh:/start.sh:ro
+      - ./conf_prom/prometheus.tpl.yml:/prometheus/prometheus.tpl.yml:ro
+      - ./conf_prom/prometheus.yml:/prometheus/prometheus.yml:rw
       - ${PROMETHEUS_DATA_DIR:-/data/prometheus_data}:/prometheus/data
-    command:
-      - '--config.file=/prometheus/prometheus.yml'
-      - '--web.enable-remote-write-receiver'
-      - '--storage.tsdb.retention.time=60d'
-      - '--storage.tsdb.wal-compression'
-      - '--web.enable-lifecycle'
+    entrypoint: ["/bin/sh", "/start.sh"]
     networks:
       - monitoring
     environment:
       - DGX_HOST=${DGX_HOST}
+      - DGX_COLLECTOR_PORT=${DGX_COLLECTOR_PORT:-9273}
+      - DGX_SGLANG_PORT=${DGX_SGLANG_PORT:-8888}
 
   grafana:
     image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
@@ -40,9 +39,9 @@ services:
       resources:
         limits:
           memory: ${GRAFANA_MEMORY_LIMIT:-4g}
+    user: "0"
     volumes:
       - ./conf_grafana/provisioning:/etc/grafana/provisioning
-      - ./conf_grafana/dashboards:/var/lib/grafana/dashboards
       - ${GRAFANA_DATA_DIR:-/data/grafana_data}:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
