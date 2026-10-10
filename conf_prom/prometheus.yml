@@ -9,15 +9,17 @@ scrape_configs:
       - targets: ["prometheus:9090"]
 
   # DGX Spark (GB10) — runs dgx_collector.py on the remote host.
-  # Set DGX_HOST to the DGX Spark IP (env var), e.g. 192.168.1.100.
-  # Ensure port 8888 is reachable through the firewall.
+  # DGX_HOST must be set; DGX_COLLECTOR_PORT defaults to 9273.
   - job_name: "dgx-spark"
     scrape_interval: 15s
     scrape_timeout: 10s
     static_configs:
-      - targets: ["${DGX_HOST}:8888"]
+      - targets: ["<DGX_HOST>:${DGX_COLLECTOR_PORT:-9273}"]
 
-# Add more remote targets below, e.g.:
-#   - job_name: "another-host"
-#     static_configs:
-#       - targets: ["192.168.1.101:9273"]
+  # SGLang / model serving metrics on the same DGX host.
+  # DGX_SGLANG_PORT defaults to 8888.
+  - job_name: "dgx-spark-sglang"
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ["<DGX_HOST>:${DGX_SGLANG_PORT:-8888}"]
