@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "dgx-gpu-smi"
+    "name": "dgx-spark-overview"
   },
   "spec": {
     "annotations": [
@@ -3252,7 +3252,7 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "DGX Spark/GPU & Unified Memory",
+    "title": "DGX Spark Overview",
     "variables": [
       {
         "kind": "DatasourceVariable",
