@@ -62,7 +62,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Current GPU utilization",
           "id": 1,
           "links": [],
           "title": "GPU utilization",
@@ -73,7 +73,8 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
-                    "mode": "thresholds"
+                    "fixedColor": "text",
+                    "mode": "fixed"
                   },
                   "max": 1,
                   "min": 0,
@@ -257,31 +258,16 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
+                        "app": "grafana-assistant-app",
                         "expr": "dgx_gpu_power_draw_watts",
-                        "legendFormat": "power (W)"
+                        "instant": false,
+                        "legendFormat": "power (W)",
+                        "queryType": "range",
+                        "range": true
                       },
                       "version": "v0"
                     },
                     "refId": "A"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "${Datasource}"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expr": "dgx_gpu_temperature_celsius",
-                        "legendFormat": "temp (°C)"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "B"
                   }
                 }
               ],
@@ -292,7 +278,7 @@
           "description": "",
           "id": 11,
           "links": [],
-          "title": "GPU power & temperature",
+          "title": "GPU power",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -311,7 +297,7 @@
                     "barAlignment": 0,
                     "barWidthFactor": 0.6,
                     "drawStyle": "line",
-                    "fillOpacity": 20,
+                    "fillOpacity": 10,
                     "gradientMode": "none",
                     "hideFrom": {
                       "legend": false,
@@ -351,20 +337,7 @@
                   },
                   "unit": "watt"
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "temp (°C)"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "celsius"
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               },
               "options": {
                 "annotations": {
@@ -590,7 +563,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Total unified memory used by the system (CPU + GPU)",
           "id": 22,
           "links": [],
           "title": "Unified memory in use",
@@ -601,7 +574,8 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
-                    "mode": "thresholds"
+                    "fixedColor": "text",
+                    "mode": "fixed"
                   },
                   "thresholds": {
                     "mode": "absolute",
@@ -761,7 +735,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Unified memory allocated by processes using the GPU",
           "id": 24,
           "links": [],
           "title": "Held by GPU processes",
@@ -772,7 +746,8 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
-                    "mode": "thresholds"
+                    "fixedColor": "text",
+                    "mode": "fixed"
                   },
                   "thresholds": {
                     "mode": "absolute",
@@ -992,7 +967,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Total, used, available and GPU-held unified memory",
           "id": 30,
           "links": [],
           "title": "Unified memory over time",
@@ -1014,7 +989,7 @@
                     "barAlignment": 0,
                     "barWidthFactor": 0.6,
                     "drawStyle": "line",
-                    "fillOpacity": 15,
+                    "fillOpacity": 0,
                     "gradientMode": "none",
                     "hideFrom": {
                       "legend": false,
@@ -1109,7 +1084,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Unified memory used / total",
           "id": 31,
           "links": [],
           "title": "Usage %",
@@ -1133,11 +1108,11 @@
                       },
                       {
                         "color": "yellow",
-                        "value": 60
+                        "value": 80
                       },
                       {
                         "color": "red",
-                        "value": 85
+                        "value": 90
                       }
                     ]
                   },
@@ -1401,10 +1376,37 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "Time": true,
+                        "__name__": true,
+                        "instance": true,
+                        "job": true
+                      },
+                      "indexByName": {
+                        "Value": 3,
+                        "pid": 1,
+                        "process_name": 0,
+                        "type": 2
+                      },
+                      "renameByName": {
+                        "Value": "Memory",
+                        "pid": "PID",
+                        "process_name": "Process",
+                        "type": "Type"
+                      }
+                    }
+                  }
+                }
+              ]
             }
           },
-          "description": "",
+          "description": "Per-process GPU memory held in unified memory (instant)",
           "id": 41,
           "links": [],
           "title": "GPU process memory",
@@ -1455,7 +1457,11 @@
                     "properties": [
                       {
                         "id": "unit",
-                        "value": "short"
+                        "value": "none"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 0
                       }
                     ]
                   },
@@ -2707,6 +2713,127 @@
             "version": "13.0.2"
           }
         }
+      },
+      "panel-78": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "${Datasource}"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "app": "grafana-assistant-app",
+                        "expr": "dgx_gpu_temperature_celsius",
+                        "instant": false,
+                        "legendFormat": "temp (°C)",
+                        "queryType": "range",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 78,
+          "links": [],
+          "title": "GPU temperature over time",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.0.2"
+          }
+        }
       }
     },
     "layout": {
@@ -2717,7 +2844,7 @@
             "kind": "RowsLayoutRow",
             "spec": {
               "collapse": false,
-              "hideHeader": true,
+              "hideHeader": false,
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -2808,15 +2935,28 @@
                           "name": "panel-11"
                         },
                         "height": 8,
-                        "width": 12,
+                        "width": 6,
                         "x": 12,
+                        "y": 5
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-78"
+                        },
+                        "height": 8,
+                        "width": 6,
+                        "x": 18,
                         "y": 5
                       }
                     }
                   ]
                 }
               },
-              "title": ""
+              "title": "GPU"
             }
           },
           {
@@ -3093,7 +3233,7 @@
       "unified-memory"
     ],
     "timeSettings": {
-      "autoRefresh": "10s",
+      "autoRefresh": "30s",
       "autoRefreshIntervals": [
         "5s",
         "10s",
@@ -3139,9 +3279,7 @@
           "allValue": ".*",
           "allowCustomValue": true,
           "current": {
-            "text": [
-              "All"
-            ],
+            "text": "All",
             "value": [
               "$__all"
             ]
