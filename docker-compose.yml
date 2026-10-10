@@ -42,7 +42,6 @@ services:
     user: "0"
     volumes:
       - ./conf_grafana/provisioning:/etc/grafana/provisioning
-      - ./conf_grafana/dashboards:/var/lib/grafana/dashboards
       - ${GRAFANA_DATA_DIR:-/data/grafana_data}:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
