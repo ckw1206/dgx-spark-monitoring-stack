@@ -23,7 +23,6 @@ ProtectHome=true
 ReadOnlyPaths=/proc/meminfo /proc/stat /proc/loadavg /proc/cpuinfo /etc/hostname /usr/local/cuda /usr/local/cuda-12 /usr/local/cuda-13
 PrivateTmp=true
 NoNewPrivileges=false
-SupplementaryGroups=nvidia
 
 [Install]
 WantedBy=multi-user.target
