@@ -3224,7 +3224,22 @@
         ]
       }
     },
-    "links": [],
+    "links": [
+      {
+        "title": "GPU dashboards",
+        "type": "dashboards",
+        "tags": [
+          "gpu"
+        ],
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": true,
+        "targetBlank": false,
+        "tooltip": "",
+        "url": ""
+      }
+    ],
     "liveNow": false,
     "preload": false,
     "tags": [
