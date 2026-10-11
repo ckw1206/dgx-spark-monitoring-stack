@@ -29,104 +29,6 @@
     "cursorSync": "Off",
     "editable": true,
     "elements": {
-      "panel-16": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "${ds}"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "app": "grafana-assistant-app",
-                        "expr": "up{job!=\"prometheus\"}",
-                        "instant": true,
-                        "legendFormat": "{{job}}",
-                        "queryType": "instant",
-                        "range": false
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 16,
-          "links": [],
-          "title": "Scrape Targets Up",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "mappings": [
-                    {
-                      "options": {
-                        "0": {
-                          "color": "red",
-                          "text": "DOWN"
-                        },
-                        "1": {
-                          "color": "green",
-                          "text": "UP"
-                        }
-                      },
-                      "type": "value"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "red",
-                        "value": 0
-                      },
-                      {
-                        "color": "green",
-                        "value": 1
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "value_and_name",
-                "wideLayout": true
-              }
-            },
-            "version": "13.0.2"
-          }
-        }
-      },
       "panel-17": {
         "kind": "Panel",
         "spec": {
@@ -1215,6 +1117,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "app": "grafana-assistant-app",
+                        "editorMode": "code",
                         "expr": "litellm_deployment_state{litellm_model_name=~\"$model\"}",
                         "instant": true,
                         "legendFormat": "{{litellm_model_name}}",
@@ -1301,375 +1204,6 @@
             "version": "13.0.2"
           }
         }
-      },
-      "panel-28": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "${ds}"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "app": "grafana-assistant-app",
-                        "expr": "dgx_gpu_utilization_ratio",
-                        "instant": false,
-                        "legendFormat": "{{instance}}",
-                        "queryType": "range",
-                        "range": true
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 28,
-          "links": [],
-          "title": "GPU Utilization",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 0,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "linear",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "auto",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "max": 1,
-                  "min": 0,
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "orange",
-                        "value": 0.8
-                      },
-                      {
-                        "color": "red",
-                        "value": 0.95
-                      }
-                    ]
-                  },
-                  "unit": "percentunit"
-                },
-                "overrides": []
-              },
-              "options": {
-                "annotations": {
-                  "clustering": -1,
-                  "multiLane": false
-                },
-                "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "mode": "multi",
-                  "sort": "none"
-                }
-              }
-            },
-            "version": "13.0.2"
-          }
-        }
-      },
-      "panel-29": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "${ds}"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "app": "grafana-assistant-app",
-                        "expr": "dgx_gpu_power_draw_watts",
-                        "instant": false,
-                        "legendFormat": "{{instance}}",
-                        "queryType": "range",
-                        "range": true
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 29,
-          "links": [],
-          "title": "GPU Power Draw",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 0,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "linear",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "auto",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      }
-                    ]
-                  },
-                  "unit": "watt"
-                },
-                "overrides": []
-              },
-              "options": {
-                "annotations": {
-                  "clustering": -1,
-                  "multiLane": false
-                },
-                "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "mode": "multi",
-                  "sort": "none"
-                }
-              }
-            },
-            "version": "13.0.2"
-          }
-        }
-      },
-      "panel-30": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "${ds}"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "app": "grafana-assistant-app",
-                        "expr": "dgx_gpu_temperature_celsius",
-                        "instant": false,
-                        "legendFormat": "{{instance}}",
-                        "queryType": "range",
-                        "range": true
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 30,
-          "links": [],
-          "title": "GPU Temperature",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 0,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "linear",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "auto",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "orange",
-                        "value": 75
-                      },
-                      {
-                        "color": "red",
-                        "value": 85
-                      }
-                    ]
-                  },
-                  "unit": "celsius"
-                },
-                "overrides": []
-              },
-              "options": {
-                "annotations": {
-                  "clustering": -1,
-                  "multiLane": false
-                },
-                "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
-                  "placement": "bottom",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "mode": "multi",
-                  "sort": "none"
-                }
-              }
-            },
-            "version": "13.0.2"
-          }
-        }
       }
     },
     "layout": {
@@ -1691,37 +1225,11 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-16"
-                        },
-                        "height": 6,
-                        "width": 8,
-                        "x": 0,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
                           "name": "panel-17"
                         },
                         "height": 6,
-                        "width": 4,
-                        "x": 8,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-19"
-                        },
-                        "height": 6,
-                        "width": 4,
-                        "x": 12,
+                        "width": 6,
+                        "x": 0,
                         "y": 0
                       }
                     },
@@ -1733,8 +1241,21 @@
                           "name": "panel-18"
                         },
                         "height": 6,
-                        "width": 4,
-                        "x": 16,
+                        "width": 6,
+                        "x": 6,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-19"
+                        },
+                        "height": 6,
+                        "width": 6,
+                        "x": 12,
                         "y": 0
                       }
                     },
@@ -1746,15 +1267,15 @@
                           "name": "panel-20"
                         },
                         "height": 6,
-                        "width": 4,
-                        "x": 20,
+                        "width": 6,
+                        "x": 18,
                         "y": 0
                       }
                     }
                   ]
                 }
               },
-              "title": "Overview: targets, traffic, failures, spend"
+              "title": "Overview: traffic, failures, spend"
             }
           },
           {
@@ -1895,78 +1416,23 @@
               },
               "title": "Errors and deployment health"
             }
-          },
-          {
-            "kind": "RowsLayoutRow",
-            "spec": {
-              "collapse": false,
-              "fillScreen": false,
-              "hideHeader": false,
-              "layout": {
-                "kind": "GridLayout",
-                "spec": {
-                  "items": [
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-28"
-                        },
-                        "height": 8,
-                        "width": 8,
-                        "x": 0,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-29"
-                        },
-                        "height": 8,
-                        "width": 8,
-                        "x": 8,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-30"
-                        },
-                        "height": 8,
-                        "width": 8,
-                        "x": 16,
-                        "y": 0
-                      }
-                    }
-                  ]
-                }
-              },
-              "title": "GPU health (dgx-spark): utilization, power, temperature"
-            }
           }
         ]
       }
     },
     "links": [
       {
-        "title": "GPU dashboards",
-        "type": "dashboards",
-        "tags": [
-          "gpu"
-        ],
         "asDropdown": true,
         "icon": "external link",
         "includeVars": false,
         "keepTime": true,
+        "tags": [
+          "gpu"
+        ],
         "targetBlank": false,
+        "title": "GPU dashboards",
         "tooltip": "",
+        "type": "dashboards",
         "url": ""
       }
     ],
@@ -1999,7 +1465,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-6h",
+      "from": "now-3h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -2032,7 +1498,9 @@
           "allValue": ".*",
           "allowCustomValue": true,
           "current": {
-            "text": "All",
+            "text": [
+              "All"
+            ],
             "value": [
               "$__all"
             ]
