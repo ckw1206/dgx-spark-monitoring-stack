@@ -12,7 +12,7 @@ ExecStart=/usr/bin/python3 /opt/dgx_collector.py
 Restart=on-failure
 RestartSec=5s
 
-Environment=DGX_EXPORTER_PORT=8888
+Environment=DGX_EXPORTER_PORT=9273
 Environment=COLLECT_INTERVAL=10
 # Environment=DGX_HOST_NAME=dgx-spark
 # Environment=DGX_DRIVER_VERSION=550
