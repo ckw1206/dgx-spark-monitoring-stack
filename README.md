@@ -15,7 +15,7 @@ ssh root@<dgx-host>
   curl http://localhost:9273/metrics   # verify
 
 # 2. Start the monitoring stack
-cp .env.example .env   # edit .env to set DGX_HOST and other vars
+cp .env.example .env   # edit .env to set DGX_HOST, LITELLM_HOST and other vars
 docker compose up -d
 ```
 
@@ -34,10 +34,14 @@ Then open Grafana at http://localhost:3000 (admin / admin).
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PROMETHEUS_MEMORY_LIMIT` | `24g` | Prometheus memory limit |
+| `PROMETHEUS_MEMORY_LIMIT` | `4g` | Prometheus memory limit |
 | `PROMETHEUS_DATA_DIR` | `/data/prometheus_data` | Prometheus TSDB data dir |
-| `DGX_HOST` | `192.168.1.100` | DGX Spark host IP (collector endpoint) |
-| `GRAFANA_VERSION` | `latest` | Grafana image tag |
+| `DGX_HOST` | — (**required**) | DGX Spark host IP; Prometheus refuses to start if empty |
+| `DGX_COLLECTOR_PORT` | `9273` | `dgx_collector.py` metrics port |
+| `DGX_SGLANG_PORT` | `8888` | SGLang `/metrics` port |
+| `LITELLM_HOST` | — (**required**) | LiteLLM proxy host IP; Prometheus refuses to start if empty |
+| `LITELLM_METRICS_PORT` | `4001` | LiteLLM dedicated metrics port |
+| `GRAFANA_VERSION` | `latest` | Grafana image tag (dashboards need ≥ 12) |
 | `GRAFANA_MEMORY_LIMIT` | `4g` | Grafana memory limit |
 | `GRAFANA_DATA_DIR` | `/data/grafana_data` | Grafana data dir |
 | `GRAFANA_PORT` | `3000` | Host port for Grafana UI |
@@ -46,13 +50,22 @@ Then open Grafana at http://localhost:3000 (admin / admin).
 
 ### Prometheus Config
 
-- Config: `conf_prom/prometheus.yml`
+- Config template: `conf_prom/prometheus.tpl.yml`. `scripts/start.sh` renders it inside the container at start, substituting any `${VAR}` / `${VAR:-default}` from the environment, so real IPs never land in the repo. New variables must also be passed through in `docker-compose.yml`.
+- Scrape jobs: `dgx-spark` (collector, `${DGX_HOST}:${DGX_COLLECTOR_PORT}`), `dgx-spark-sglang` (SGLang, `${DGX_HOST}:${DGX_SGLANG_PORT}`), `litellm-dedicated` (`${LITELLM_HOST}:${LITELLM_METRICS_PORT}`).
 
 ### Grafana Provisioning
 
 Dashboards are auto-loaded from `conf_grafana/provisioning/dashboards/`. Drop additional JSON dashboards there.
 
-The included **DGX Spark dashboard** (GPU & Unified Memory for GB10) requires the collector running on the DGX host.
+| Dashboard | URL | Data source |
+|-----------|-----|-------------|
+| DGX Spark Overview | `/d/dgx-spark-overview` | DGX collector (GPU, unified memory, CPU) |
+| SGLang Inference Server | `/d/sglang-inference-server` | SGLang `/metrics` |
+| LiteLLM Overview | `/d/litellm-overview` | LiteLLM proxy `/metrics` + DGX collector |
+
+Dashboards tagged `gpu` link to each other from the top bar.
+
+Dashboards are Grafana v2-schema resources. When adding one exported from the UI: wrap the spec as `{"apiVersion": "dashboard.grafana.app/v2", "kind": "Dashboard", "metadata": {"name": "<uid>"}, "spec": {...}}`, and set the datasource variable's `current` to `Prometheus` instead of an instance-specific UID.
 
 ## DGX Spark Collector
 
