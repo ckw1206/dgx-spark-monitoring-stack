@@ -1961,7 +1961,7 @@
         "tags": [
           "gpu"
         ],
-        "asDropdown": false,
+        "asDropdown": true,
         "icon": "external link",
         "includeVars": false,
         "keepTime": true,
