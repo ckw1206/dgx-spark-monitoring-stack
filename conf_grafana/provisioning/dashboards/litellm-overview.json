@@ -48,9 +48,9 @@
                       "kind": "DataQuery",
                       "spec": {
                         "app": "grafana-assistant-app",
-                        "expr": "up",
+                        "expr": "up{job!=\"prometheus\"}",
                         "instant": true,
-                        "legendFormat": "{{job}} {{instance}}",
+                        "legendFormat": "{{job}}",
                         "queryType": "instant",
                         "range": false
                       },
