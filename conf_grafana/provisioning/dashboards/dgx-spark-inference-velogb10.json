@@ -1444,7 +1444,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "histogram_quantile(0.5, sum by (le) (rate(velogb10_prefill_tokens_per_second_bucket{instance=~\"$instance\"}[5m]))) < 12000",
+                        "expr": "((clamp_max(histogram_quantile(0.5, sum by (le) (rate(velogb10_prefill_tokens_per_second_bucket{instance=~\"$instance\"}[5m]))), 12000)) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1466,7 +1466,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "histogram_quantile(0.1, sum by (le) (rate(velogb10_prefill_tokens_per_second_bucket{instance=~\"$instance\"}[5m]))) < 12000",
+                        "expr": "((clamp_max(histogram_quantile(0.1, sum by (le) (rate(velogb10_prefill_tokens_per_second_bucket{instance=~\"$instance\"}[5m]))), 12000)) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1488,7 +1488,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(velogb10_prefill_tokens_per_second_sum{instance=~\"$instance\"}[5m])) / (sum(rate(velogb10_prefill_tokens_per_second_count{instance=~\"$instance\"}[5m])) > 0)",
+                        "expr": "((sum(rate(velogb10_prefill_tokens_per_second_sum{instance=~\"$instance\"}[5m])) / (sum(rate(velogb10_prefill_tokens_per_second_count{instance=~\"$instance\"}[5m])) > 0)) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1504,7 +1504,7 @@
               "transformations": []
             }
           },
-          "description": "Prompt tokens / time to first token per request, 5-minute windows (includes queueing). The histogram's top finite bucket is 12,000 tok/s and cached turns land above it, so p50/p10 are drawn only below that cap: a gap means at least that share of requests was served mostly from the prefix cache. The mean includes cached turns.",
+          "description": "Prompt tokens / time to first token per request, 5-minute windows (includes queueing). The histogram's top finite bucket is 12,000 tok/s (dashed line) and cached turns land above it, so p50/p10 sitting on that line mean 12,000 tok/s or more. The mean includes cached turns. 0 means no request finished in the window.",
           "id": 12,
           "links": [],
           "title": "Prefill rate per request",
@@ -1538,8 +1538,9 @@
                     "lineWidth": 1,
                     "pointSize": 5,
                     "scaleDistribution": {
-                      "type": "log",
-                      "log": 10
+                      "type": "symlog",
+                      "log": 10,
+                      "linearThreshold": 100
                     },
                     "showPoints": "never",
                     "showValues": false,
@@ -1549,15 +1550,19 @@
                       "mode": "none"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "dashed"
                     }
                   },
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
+                        "color": "transparent",
                         "value": 0
+                      },
+                      {
+                        "color": "text",
+                        "value": 12000
                       }
                     ]
                   },
@@ -1764,7 +1769,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(velogb10_prompt_tokens_total{instance=~\"$instance\"}[$__rate_interval])) - sum(rate(velogb10_prompt_tokens_cached_total{instance=~\"$instance\"}[$__rate_interval]))",
+                        "expr": "((sum(rate(velogb10_prompt_tokens_total{instance=~\"$instance\"}[$__rate_interval])) - sum(rate(velogb10_prompt_tokens_cached_total{instance=~\"$instance\"}[$__rate_interval]))) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1786,7 +1791,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(velogb10_prompt_tokens_cached_total{instance=~\"$instance\"}[$__rate_interval]))",
+                        "expr": "((sum(rate(velogb10_prompt_tokens_cached_total{instance=~\"$instance\"}[$__rate_interval]))) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1808,7 +1813,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(velogb10_generation_tokens_total{instance=~\"$instance\"}[$__rate_interval]))",
+                        "expr": "((sum(rate(velogb10_generation_tokens_total{instance=~\"$instance\"}[$__rate_interval]))) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1931,7 +1936,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(increase(velogb10_prompt_tokens_cached_total{instance=~\"$instance\"}[$__rate_interval])) / (sum(increase(velogb10_prompt_tokens_total{instance=~\"$instance\"}[$__rate_interval])) > 0)",
+                        "expr": "((sum(increase(velogb10_prompt_tokens_cached_total{instance=~\"$instance\"}[$__rate_interval])) / (sum(increase(velogb10_prompt_tokens_total{instance=~\"$instance\"}[$__rate_interval])) > 0)) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -1947,7 +1952,7 @@
               "transformations": []
             }
           },
-          "description": "Share of prompt tokens served from the prefix cache. Drops mean conversations are being evicted from the lanes and re-prefilled.",
+          "description": "Share of prompt tokens served from the prefix cache. Drops mean conversations are being evicted from the lanes and re-prefilled. 0 means no prompt tokens finished in the window.",
           "id": 15,
           "links": [],
           "title": "Prefix cache hit ratio",
@@ -2180,7 +2185,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(velogb10_spec_accepted_tokens_total{instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(velogb10_spec_draft_tokens_total{instance=~\"$instance\"}[$__rate_interval])) > 0)",
+                        "expr": "((sum(rate(velogb10_spec_accepted_tokens_total{instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(velogb10_spec_draft_tokens_total{instance=~\"$instance\"}[$__rate_interval])) > 0)) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -2196,7 +2201,7 @@
               "transformations": []
             }
           },
-          "description": "Share of speculative draft tokens the verify accepted.",
+          "description": "Share of speculative draft tokens the verify accepted. 0 means no speculative drafts in the window.",
           "id": 17,
           "links": [],
           "title": "Draft acceptance",
@@ -2301,7 +2306,7 @@
                       "group": "prometheus",
                       "kind": "DataQuery",
                       "spec": {
-                        "expr": "sum(rate(velogb10_spec_emitted_tokens_total{instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(velogb10_spec_rounds_total{instance=~\"$instance\"}[$__rate_interval])) > 0)",
+                        "expr": "((sum(rate(velogb10_spec_emitted_tokens_total{instance=~\"$instance\"}[$__rate_interval])) / (sum(rate(velogb10_spec_rounds_total{instance=~\"$instance\"}[$__rate_interval])) > 0)) >= 0) or vector(0)",
                         "instant": false,
                         "queryType": "range",
                         "range": true,
@@ -2317,7 +2322,7 @@
               "transformations": []
             }
           },
-          "description": "Tokens emitted per speculative round (accepted + 1); 1.0 would mean speculation is not paying.",
+          "description": "Tokens emitted per speculative round (accepted + 1); 1.0 would mean speculation is not paying. 0 means no speculative rounds in the window.",
           "id": 18,
           "links": [],
           "title": "Tokens per verify round",
@@ -3210,6 +3215,239 @@
             "version": "13.0.2"
           }
         }
+      },
+      "panel-26": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum by (arm) (rate(velogb10_spec_lanes_arm_tok_total{instance=~\"$instance\"}[$__rate_interval]))",
+                        "instant": false,
+                        "queryType": "range",
+                        "range": true,
+                        "legendFormat": "{{arm}}"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(velogb10_spec_lanes_arm_tok_total{instance=~\"$instance\"}[$__rate_interval]))",
+                        "instant": false,
+                        "queryType": "range",
+                        "range": true,
+                        "legendFormat": "total"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "${datasource}"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expr": "sum(rate(velogb10_spec_lanes_arm_tok_total{instance=~\"$instance\"}[$__rate_interval])) / (avg_over_time(sum(velogb10_requests_running{instance=~\"$instance\"})[$__rate_interval:10s]) > 0)",
+                        "instant": false,
+                        "queryType": "range",
+                        "range": true,
+                        "legendFormat": "per running request"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Tokens generated per second across all lanes, counted as each scheduler round delivers them (not when a request finishes), stacked by scheduler arm: serial = speculative rounds (including packed pairs), shared = plain steps shared by all busy lanes. Total is the sum; per running request divides it by the average number of requests running. Over 30-60 minutes it matches velogb10_generation_tokens_total within about 2% (the difference is tokens of requests still running).",
+          "id": 26,
+          "links": [],
+          "title": "Generation throughput (live)",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 30,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "min": 0,
+                  "decimals": 0,
+                  "unit": "suffix: tok/s"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "total"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.stacking",
+                        "value": {
+                          "group": "A",
+                          "mode": "none"
+                        }
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "text",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "per running request"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.stacking",
+                        "value": {
+                          "group": "A",
+                          "mode": "none"
+                        }
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "dash": [
+                            10,
+                            10
+                          ],
+                          "fill": "dash"
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "mean",
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              }
+            },
+            "version": "13.0.2"
+          }
+        }
       }
     },
     "layout": {
@@ -3310,11 +3548,24 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-26"
+                        },
+                        "height": 8,
+                        "width": 8,
+                        "x": 0,
+                        "y": 4
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-7"
                         },
                         "height": 8,
-                        "width": 12,
-                        "x": 0,
+                        "width": 8,
+                        "x": 8,
                         "y": 4
                       }
                     },
@@ -3326,8 +3577,8 @@
                           "name": "panel-8"
                         },
                         "height": 8,
-                        "width": 12,
-                        "x": 12,
+                        "width": 8,
+                        "x": 16,
                         "y": 4
                       }
                     }
