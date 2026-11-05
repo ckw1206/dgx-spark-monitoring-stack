@@ -39,6 +39,7 @@ Then open Grafana at http://localhost:3000 (admin / admin).
 | `DGX_HOST` | — (**required**) | DGX Spark host IP; Prometheus refuses to start if empty |
 | `DGX_COLLECTOR_PORT` | `9273` | `dgx_collector.py` metrics port |
 | `DGX_SGLANG_PORT` | `8888` | SGLang `/metrics` port |
+| `DGX_INFERENCE_PORT` | `8000` | Inference engine `/metrics` port, scraped every 10s (the bundled dashboard reads veloGB10's `velogb10_*` metrics) |
 | `LITELLM_HOST` | — (**required**) | LiteLLM proxy host IP; Prometheus refuses to start if empty |
 | `LITELLM_METRICS_PORT` | `4001` | LiteLLM dedicated metrics port |
 | `GRAFANA_VERSION` | `latest` | Grafana image tag (dashboards need ≥ 12) |
@@ -51,7 +52,7 @@ Then open Grafana at http://localhost:3000 (admin / admin).
 ### Prometheus Config
 
 - Config template: `conf_prom/prometheus.tpl.yml`. `scripts/start.sh` renders it inside the container at start, substituting any `${VAR}` / `${VAR:-default}` from the environment, so real IPs never land in the repo. New variables must also be passed through in `docker-compose.yml`.
-- Scrape jobs: `dgx-spark` (collector, `${DGX_HOST}:${DGX_COLLECTOR_PORT}`), `dgx-spark-sglang` (SGLang, `${DGX_HOST}:${DGX_SGLANG_PORT}`), `litellm-dedicated` (`${LITELLM_HOST}:${LITELLM_METRICS_PORT}`).
+- Scrape jobs: `dgx-spark` (collector, `${DGX_HOST}:${DGX_COLLECTOR_PORT}`), `dgx-spark-sglang` (SGLang, `${DGX_HOST}:${DGX_SGLANG_PORT}`), `dgx-spark-inference` (inference engine, `${DGX_HOST}:${DGX_INFERENCE_PORT}`, 10s), `litellm-dedicated` (`${LITELLM_HOST}:${LITELLM_METRICS_PORT}`).
 
 ### Grafana Provisioning
 
@@ -62,6 +63,7 @@ Dashboards are auto-loaded from `conf_grafana/provisioning/dashboards/`. Drop ad
 | DGX Spark Overview | `/d/dgx-spark-overview` | DGX collector (GPU, unified memory, CPU) |
 | SGLang Inference Server | `/d/sglang-inference-server` | SGLang `/metrics` |
 | LiteLLM Overview | `/d/litellm-overview` | LiteLLM proxy `/metrics` + DGX collector |
+| DGX Spark Inference (veloGB10) | `/d/dgx-spark-inference-velogb10` | veloGB10 `/metrics` (job `dgx-spark-inference`) + DGX collector |
 
 Dashboards tagged `gpu` link to each other from the top bar.
 
