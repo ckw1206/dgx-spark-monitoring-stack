@@ -29,7 +29,8 @@ services:
       - LITELLM_METRICS_PORT=${LITELLM_METRICS_PORT:-4001}
 
   grafana:
-    image: grafana/grafana-oss:${GRAFANA_VERSION:-latest}
+    # grafana/grafana is the OSS image; grafana/grafana-oss stopped at 13.0.2.
+    image: grafana/grafana:${GRAFANA_VERSION:-13.3.2}
     container_name: grafana
     restart: always
     logging:
@@ -47,8 +48,19 @@ services:
       - ${GRAFANA_DATA_DIR:-/data/grafana_data}:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      # Pinned; installed in the background on first start (needs grafana.com).
+      # Grafana Assistant requires Grafana >= 13.1.
+      - GF_PLUGINS_PREINSTALL=grafana-assistant-app@2.1.19
+    # Refuse to start without an admin password (no admin/admin fallback).
+    # Checked here, not with ${VAR:?}, so `docker compose ps/logs/down` work without it.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - '[ -n "$$GF_SECURITY_ADMIN_PASSWORD" ] || { echo "ERROR: GRAFANA_ADMIN_PASSWORD is not set" >&2; exit 1; }; exec /run.sh "$$@"'
+      - --
     ports:
       - "${GRAFANA_PORT:-3000}:3000"
     networks:
