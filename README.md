@@ -39,7 +39,7 @@ Then open Grafana at http://localhost:3000 (admin / admin).
 | `DGX_HOST` | — (**required**) | DGX Spark host IP; Prometheus refuses to start if empty |
 | `DGX_COLLECTOR_PORT` | `9273` | `dgx_collector.py` metrics port |
 | `DGX_SGLANG_PORT` | `8888` | SGLang `/metrics` port |
-| `DGX_INFERENCE_PORT` | `8000` | Inference engine `/metrics` port, scraped every 10s (the bundled dashboard reads veloGB10's `velogb10_*` metrics) |
+| `DGX_INFERENCE_PORT` | `8000` | Inference engine `/metrics` port, scraped every 10s (read by the veloGB10 and Infernix dashboards) |
 | `LITELLM_HOST` | — (**required**) | LiteLLM proxy host IP; Prometheus refuses to start if empty |
 | `LITELLM_METRICS_PORT` | `4001` | LiteLLM dedicated metrics port |
 | `GRAFANA_VERSION` | `latest` | Grafana image tag (dashboards need ≥ 12) |
@@ -64,6 +64,7 @@ Dashboards are auto-loaded from `conf_grafana/provisioning/dashboards/`. Drop ad
 | SGLang Inference Server | `/d/sglang-inference-server` | SGLang `/metrics` |
 | LiteLLM Overview | `/d/litellm-overview` | LiteLLM proxy `/metrics` + DGX collector |
 | DGX Spark Inference (veloGB10) | `/d/dgx-spark-inference-velogb10` | veloGB10 `/metrics` (job `dgx-spark-inference`) + DGX collector |
+| DGX Spark Inference (Infernix) | `/d/dgx-spark-inference-infernix` | Infernix `infernix-serve` `/metrics` (job `dgx-spark-inference`) + DGX collector |
 
 Dashboards tagged `gpu` link to each other from the top bar.
 
