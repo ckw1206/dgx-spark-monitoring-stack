@@ -19,7 +19,7 @@ cp .env.example .env   # edit .env to set DGX_HOST, LITELLM_HOST and other vars
 docker compose up -d
 ```
 
-Then open Grafana at http://localhost:3000 (admin / admin).
+Then open Grafana at http://localhost:3000 and log in as `GRAFANA_ADMIN_USER` with `GRAFANA_ADMIN_PASSWORD` from `.env`.
 
 ## Services
 
@@ -42,12 +42,12 @@ Then open Grafana at http://localhost:3000 (admin / admin).
 | `DGX_INFERENCE_PORT` | `8000` | Inference engine `/metrics` port, scraped every 10s (read by the veloGB10 and Infernix dashboards) |
 | `LITELLM_HOST` | — (**required**) | LiteLLM proxy host IP; Prometheus refuses to start if empty |
 | `LITELLM_METRICS_PORT` | `4001` | LiteLLM dedicated metrics port |
-| `GRAFANA_VERSION` | `latest` | Grafana image tag (dashboards need ≥ 12) |
+| `GRAFANA_VERSION` | `13.3.2` | `grafana/grafana` image tag (dashboards need ≥ 12; Grafana Assistant needs ≥ 13.1) |
 | `GRAFANA_MEMORY_LIMIT` | `4g` | Grafana memory limit |
 | `GRAFANA_DATA_DIR` | `/data/grafana_data` | Grafana data dir |
 | `GRAFANA_PORT` | `3000` | Host port for Grafana UI |
 | `GRAFANA_ADMIN_USER` | `admin` | Grafana admin username |
-| `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana admin password |
+| `GRAFANA_ADMIN_PASSWORD` | — (**required**) | Grafana admin password; Grafana refuses to start if empty. Applied on first start only (empty data dir): on an existing install run `docker exec grafana grafana cli admin reset-admin-password <new>` |
 
 ### Prometheus Config
 
